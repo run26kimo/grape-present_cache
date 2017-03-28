@@ -18,6 +18,9 @@ module Grape
         end
 
         def create_cache_key(*keys)
+          if keys[1].is_a?(Array)
+            keys[1] = keys[1].map { |e| e.methods.include?(:cache_key) ? e.cache_key : e }
+          end
           keys.join(':')
         end
 
@@ -40,7 +43,7 @@ module Grape
             body representation
           else
             # TODO: save_block_result_to_cache
-            Grape::PresentCache.config.cache.fetch(cache_key, expires_in: cache_store_expire_time) do 
+            Grape::PresentCache.config.cache.fetch(cache_key, expires_in: cache_store_expire_time) do
               block.call.to_json
             end
           end
